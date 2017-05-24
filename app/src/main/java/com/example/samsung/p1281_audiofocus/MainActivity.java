@@ -145,15 +145,20 @@ public class MainActivity extends AppCompatActivity implements OnCompletionListe
 
                 case AudioManager.AUDIOFOCUS_LOSS:
                     event = "AUDIOFOCUS_LOSS";
+                    mediaPlayer.pause();
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                     event = "AUDIOFOCUS_LOSS_TRANSIENT";
+                    mediaPlayer.pause();
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                     event = "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK";
+                    mediaPlayer.setVolume(0.5f, 0.5f);
                     break;
                 case AudioManager.AUDIOFOCUS_GAIN:
                     event = "AUDIOFOCUS_GAIN";
+                    if (!mediaPlayer.isPlaying()) mediaPlayer.start();
+                    mediaPlayer.setVolume(1.0f, 1.0f);
                     break;
                 default:
                     break;
