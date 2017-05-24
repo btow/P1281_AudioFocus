@@ -12,7 +12,7 @@ import java.io.IOException;
 import static android.media.AudioManager.*;
 import static android.media.MediaPlayer.*;
 
-public class MainActivity extends AppCompatActivity implements OnCompletionListener {
+public class MainActivity extends AppCompatActivity implements OnCompletionListener, OnPreparedListener {
 
     private final String  DATA_STREAM = "http://online.radiorecord.ru:8101/rr_128";
     private AudioManager audioManager;
@@ -34,13 +34,15 @@ public class MainActivity extends AppCompatActivity implements OnCompletionListe
 
         int requestResult = 0;
 
+        if (mediaPlayerMusic != null) mediaPlayerMusic.release();
+
         mediaPlayerMusic = new MediaPlayer();
         try {
             mediaPlayerMusic.setDataSource(DATA_STREAM);
-            mediaPlayerMusic.prepare();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        mediaPlayerMusic.setOnPreparedListener(this);
         mediaPlayerMusic.setOnCompletionListener(this);
 
         afListenerMusic = new AFListener(mediaPlayerMusic, "Music");
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements OnCompletionListe
                 afListenerMusic, STREAM_MUSIC, AUDIOFOCUS_GAIN);
         msg = "Music request focus, result = " + requestResult;
         Messager.sendToAllRecipients(getBaseContext(), msg);
-        mediaPlayerMusic.start();
+        mediaPlayerMusic.prepareAsync();
     }
 
     public void onClickSound(View view) {
@@ -112,6 +114,15 @@ public class MainActivity extends AppCompatActivity implements OnCompletionListe
         }
         if (afListenerSound != null) {
             audioManager.abandonAudioFocus(afListenerSound);
+        }
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        if (mp != null){
+            msg = "onPrepared(), mp = " + mp.toString();
+            Messager.sendToAllRecipients(getBaseContext(), msg);
+            mp.start();
         }
     }
 
